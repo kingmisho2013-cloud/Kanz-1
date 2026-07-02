@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanz — كنز</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  body{font-family:"Tajawal","Cairo","Segoe UI",Tahoma,"Noto Kufi Arabic",system-ui,sans-serif;margin:0}
+  .no-scrollbar::-webkit-scrollbar{display:none}
+  .no-scrollbar{scrollbar-width:none}
+  .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}
+  .focusable:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+  [dir="rtl"] .rtl-flip{transform:rotate(180deg)}
+  [dir="rtl"] .rtl-keep{transform:none}
+  [dir="rtl"] .rtl-keep.rot180{transform:rotate(180deg)}
+  .tabular-nums{font-variant-numeric:tabular-nums}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+</style>
+</head>
+<body>
+<div id="root" class="min-h-screen"></div>
+
+<script>
+/* ---------------------------------- Theme ---------------------------------- */
+const THEMES = {
+  light:{"--bg":"#EAEDED","--surface":"#FFFFFF","--tile":"#F2F3F3","--ink":"#0F1111","--muted":"#565959","--line":"#D5D9D9","--topbar":"#131921","--lapis":"#232F3E","--lapis-2":"#37475A","--nav-ink":"#FFFFFF","--orange":"#FF6A00","--magenta":"#C7008E","--gold":"#FEBD69","--gold-2":"#F3A847","--gold-ink":"#0F1111","--teal":"#007185","--teal-2":"#00566A","--pom":"#CC0C39","--link":"#007185","--star":"#FFA41C","--scrim":"rgba(15,17,17,.55)","--shadow":"0 1px 2px rgba(15,17,17,.08), 0 3px 10px rgba(15,17,17,.10)","--seal":"0 6px 16px rgba(243,168,71,.4)"},
+  dark:{"--bg":"#0F1416","--surface":"#1B2226","--tile":"#232D31","--ink":"#E9EEF0","--muted":"#9BA5A8","--line":"rgba(255,255,255,.10)","--topbar":"#0A0E12","--lapis":"#131921","--lapis-2":"#232F3E","--nav-ink":"#F3F5F6","--orange":"#FF7A1A","--magenta":"#E85BC0","--gold":"#F3A847","--gold-2":"#D98B2B","--gold-ink":"#1A1206","--teal":"#2F9DB0","--teal-2":"#1E7A8A","--pom":"#F06A8C","--link":"#4FC3D8","--star":"#FFB84D","--scrim":"rgba(0,0,0,.65)","--shadow":"0 1px 2px rgba(0,0,0,.4), 0 12px 30px rgba(0,0,0,.35)","--seal":"0 6px 18px rgba(0,0,0,.5)"}
+};
+
+/* ------------------------------- Dictionaries ------------------------------ */
+const M = {
+  ar:{brand:"كنز",tagline:"سوقك، بمزاجك",deliverTo:"التوصيل إلى",city:"القاهرة الجديدة",updateLoc:"غيّر العنوان",searchPh:"بتدوّر على إيه في كنز؟",searchIn:"الكل",searchBtn:"ابحث",hello:"أهلًا، سجّل دخولك",account:"الحساب والقوائم",orders:"الطلبات",cart:"العربة",signIn:"تسجيل الدخول",newHere:"جديد هنا؟",createAcc:"اعمل حساب",yourAccount:"حسابك",yourOrders:"طلباتك",yourWishlist:"قائمة أمنياتك",yourPoints:"نقاط كنز",all:"الكل",
+    nav:["عروض اليوم","بازار","بيع معانا","موبايلات","إلكترونيات","البيت والمطبخ","كنز بلس","أزياء","أجهزة منزلية","ألعاب فيديو","سوبر ماركت"],
+    promo:"أسبوع العطور | من ١ لـ ٧ كل شهر",heroPrev:"الشريحة السابقة",heroNext:"الشريحة التالية",heroDot:"روح للشريحة",menu:"افتح القائمة",close:"إغلاق",back:"رجوع",trending:"الأكثر رواجًا",bestSellers:"الأكثر مبيعًا",newArrivals:"وصل حديثًا",digital:"المحتوى الرقمي",ereaders:"قارئات الكتب",giftCards:"بطاقات هدايا رقمية",shopByCat:"تسوّق بالفئة",seeAll:"عرض الكل",seeLess:"عرض أقل",programs:"برامج ومزايا",plus:"اشتراك كنز بلس",outlet:"أوتلت كنز",sellOn:"بيع على كنز",saveSub:"وفّر واشترك",helpSettings:"المساعدة والإعدادات",langRow:"اللغة",country:"مصر",help:"المساعدة",dealBandTitle:"صفقات الترحيب | أقل من ٤٩٩ جنيه",dealBandSub:"وكمان توصيل مجاني على أول طلب*",shopNow:"اتسوّق دلوقتي",endsIn:"العرض بينتهي بعد",limited:"عرض لفترة محدودة",off:"خصم",budgetTitle:"ركن الصفقات | نجوم كنز",budgetSub:"توصيل مجاني على أول طلب*",topPicksTitle:"مختارات المطبخ والبيت",explore:"اكتشف أكتر",addToCart:"ضيف للعربة",added:"اتضاف للعربة ✓",wish:"ضيف لقائمة الأمنيات",footTop:"ارجع لفوق",
+    footCols:[{h:"اعرفنا أكتر",l:["عن كنز","الوظائف","الأخبار","الاستدامة"]},{h:"اكسب معانا",l:["بيع على كنز","اعلن عن منتجاتك","برنامج الشركاء","اشحن معانا"]},{h:"طرق الدفع",l:["بطاقات البنوك","التقسيط بدون فوايد","الدفع عند الاستلام","محافظ إلكترونية"]},{h:"نساعدك",l:["حسابك","المرتجعات والاستبدال","تتبع طلبك","مركز المساعدة"]}],
+    rights:"© {y} كنز. كل الحقوق محفوظة. تصميم أصلي — نموذج أولي.",ratingOf:"من ٥"},
+  en:{brand:"Kanz",tagline:"Your souq, your way",deliverTo:"Deliver to",city:"New Cairo",updateLoc:"Update address",searchPh:"What are you hunting for on Kanz?",searchIn:"All",searchBtn:"Search",hello:"Hello, sign in",account:"Account & Lists",orders:"Orders",cart:"Cart",signIn:"Sign in",newHere:"New here?",createAcc:"Create account",yourAccount:"Your account",yourOrders:"Your orders",yourWishlist:"Your wishlist",yourPoints:"Kanz points",all:"All",
+    nav:["Today's Deals","Bazaar","Sell with us","Mobiles","Electronics","Home & Kitchen","Kanz Plus","Fashion","Appliances","Video Games","Supermarket"],
+    promo:"Fragrance Week | 1–7 every month",heroPrev:"Previous slide",heroNext:"Next slide",heroDot:"Go to slide",menu:"Open menu",close:"Close",back:"Back",trending:"Trending",bestSellers:"Best sellers",newArrivals:"New arrivals",digital:"Digital content",ereaders:"E-readers",giftCards:"Digital gift cards",shopByCat:"Shop by category",seeAll:"See all",seeLess:"See less",programs:"Programs & perks",plus:"Kanz Plus membership",outlet:"Kanz Outlet",sellOn:"Sell on Kanz",saveSub:"Subscribe & save",helpSettings:"Help & settings",langRow:"Language",country:"Egypt",help:"Help",dealBandTitle:"Welcome deals | Under EGP 499",dealBandSub:"Plus free delivery on your first order*",shopNow:"Shop now",endsIn:"Deals end in",limited:"Limited-time deal",off:"off",budgetTitle:"Deal corner | Kanz stars",budgetSub:"Free delivery on your first order*",topPicksTitle:"Top picks in Kitchen & Home",explore:"Explore more",addToCart:"Add to cart",added:"Added to cart ✓",wish:"Add to wishlist",footTop:"Back to top",
+    footCols:[{h:"Get to know us",l:["About Kanz","Careers","Newsroom","Sustainability"]},{h:"Make money with us",l:["Sell on Kanz","Advertise your products","Partner program","Ship with us"]},{h:"Ways to pay",l:["Bank cards","0% installments","Cash on delivery","E-wallets"]},{h:"Let us help you",l:["Your account","Returns & replacements","Track your order","Help center"]}],
+    rights:"© {y} Kanz. All rights reserved. Original design — prototype.",ratingOf:"out of 5"}
+};
+
+/* ---------------------------------- Data ----------------------------------- */
+const CATEGORIES=[
+  {id:"mobiles",icon:"smartphone",ar:"موبايلات وتابلت",en:"Mobiles & Tablets",sub:{ar:["كل الموبايلات","تابلت","شواحن وكابلات","جرابات وحمايات","باور بانك"],en:["All phones","Tablets","Chargers & cables","Cases & protection","Power banks"]}},
+  {id:"computers",icon:"laptop",ar:"كمبيوتر ومكتب",en:"Computers & Office",sub:{ar:["لابتوبات","شاشات","لوحات مفاتيح وماوس","طابعات","مستلزمات مكتبية"],en:["Laptops","Monitors","Keyboards & mice","Printers","Office supplies"]}},
+  {id:"tv",icon:"tv",ar:"شاشات وإلكترونيات",en:"TVs & Electronics",sub:{ar:["شاشات ذكية","أنظمة صوت","ريسيفرات","كاميرات","إكسسوارات"],en:["Smart TVs","Audio systems","Receivers","Cameras","Accessories"]}},
+  {id:"fashion-w",icon:"shirt",ar:"أزياء حريمي",en:"Women's Fashion",sub:{ar:["فساتين","أحذية","شنط","إكسسوارات","ملابس رياضية"],en:["Dresses","Shoes","Bags","Accessories","Activewear"]}}
+];
+const EXTRA_CATEGORIES=[
+  {id:"fashion-m",icon:"shirt",ar:"أزياء رجالي",en:"Men's Fashion"},
+  {id:"home",icon:"house",ar:"البيت والمطبخ",en:"Home & Kitchen"},
+  {id:"beauty",icon:"sparkles",ar:"الجمال والعناية",en:"Beauty & Care"},
+  {id:"gaming",icon:"gamepad-2",ar:"ألعاب فيديو",en:"Video Games"}
+];
+const HERO_SLIDES=[
+  {id:"treasure",bg:"linear-gradient(135deg,#FF8A1E 0%,#FF6A00 62%,#E85D00 100%)",icon:"gem",ar:{t:"كنوز مختارة ليك",s:"مخصوص علشانك — توصيل مجاني*",c:"اتسوّق دلوقتي",fine:"*بتطبيق الشروط"},en:{t:"Welcome finds",s:"Made for you — free delivery*",c:"Shop now",fine:"*T&Cs apply"}},
+  {id:"football",bg:"linear-gradient(120deg,#0B2A1C 0%,#12603F 60%,#1E8A57 130%)",icon:"tv",ar:{t:"ليلة الماتش جاهزة",s:"تيشيرتات وشاشات وصوت لموسم الكورة",c:"جهّز نفسك",fine:""},en:{t:"Match night, sorted",s:"Jerseys, screens and sound for football season",c:"Gear up",fine:""}},
+  {id:"fragrance",bg:"linear-gradient(115deg,#3A1030 0%,#7A1E4E 60%,#C42348 130%)",icon:"sparkles",ar:{t:"أسبوع العطور بدأ",s:"خصومات لحد ٤٠٪ على ريحتك المفضلة",c:"اكتشف العطور",fine:""},en:{t:"Fragrance Week is on",s:"Up to 40% off your signature scent",c:"Explore scents",fine:""}}
+];
+const DEAL_PRODUCTS=[
+  {id:1,icon:"headphones",hue:"linear-gradient(140deg,#1B3A6B,#101F3C)",price:1899,old:2799,off:32,rating:4.6,reviews:1284,ar:"سماعات رأس لاسلكية بعزل الضوضاء",en:"Wireless noise-cancelling headphones"},
+  {id:2,icon:"watch",hue:"linear-gradient(140deg,#0E8C7F,#0A6B61)",price:1249,old:1799,off:31,rating:4.4,reviews:862,ar:"ساعة ذكية بشاشة أموليد",en:"AMOLED smartwatch"},
+  {id:3,icon:"flame",hue:"linear-gradient(140deg,#C9820A,#8F5A05)",price:2399,old:3199,off:25,rating:4.7,reviews:2310,ar:"مقلاة هوائية ٥ لتر",en:"5L digital air fryer"},
+  {id:4,icon:"zap",hue:"linear-gradient(140deg,#7A1E4E,#3A1030)",price:349,old:499,off:30,rating:4.5,reviews:540,ar:"شاحن سريع ٦٥ واط",en:"65W GaN fast charger"},
+  {id:5,icon:"mouse",hue:"linear-gradient(140deg,#22406E,#0D1830)",price:429,old:599,off:28,rating:4.3,reviews:415,ar:"ماوس ألعاب بإضاءة RGB",en:"RGB gaming mouse"},
+  {id:6,icon:"coffee",hue:"linear-gradient(140deg,#0E6C8C,#0B3B4D)",price:899,old:1249,off:28,rating:4.2,reviews:388,ar:"خلاط كهربائي ٦٠٠ واط",en:"600W personal blender"},
+  {id:7,icon:"camera",hue:"linear-gradient(140deg,#4A3AA8,#241C57)",price:799,old:1099,off:27,rating:4.4,reviews:976,ar:"كاميرا مراقبة واي فاي",en:"Wi-Fi security camera"},
+  {id:8,icon:"shirt",hue:"linear-gradient(140deg,#C42348,#6E1128)",price:649,old:899,off:28,rating:4.1,reviews:233,ar:"مكواة بخار محمولة",en:"Handheld garment steamer"}
+];
+const TOP_PICKS=[
+  {id:11,icon:"utensils",hue:"linear-gradient(140deg,#8F5A05,#C9820A)",price:1590,rating:4.6,reviews:640,ar:"طقم حلل جرانيت ٩ قطع",en:"9-pc granite cookware set"},
+  {id:12,icon:"coffee",hue:"linear-gradient(140deg,#0A6B61,#0E8C7F)",price:740,rating:4.5,reviews:318,ar:"ماكينة قهوة تركي",en:"Turkish coffee maker"},
+  {id:13,icon:"lamp",hue:"linear-gradient(140deg,#1B3A6B,#101F3C)",price:460,rating:4.3,reviews:152,ar:"أباجورة معدن عصرية",en:"Modern metal table lamp"},
+  {id:14,icon:"flame",hue:"linear-gradient(140deg,#7A1E4E,#C42348)",price:2150,rating:4.7,reviews:903,ar:"حلة ضغط كهربائية ٦ لتر",en:"6L electric pressure cooker"},
+  {id:15,icon:"lightbulb",hue:"linear-gradient(140deg,#22406E,#4A3AA8)",price:320,rating:4.2,reviews:96,ar:"لمبات ذكية (٣ قطع)",en:"Smart bulbs (3-pack)"},
+  {id:16,icon:"package",hue:"linear-gradient(140deg,#0B3B4D,#0E6C8C)",price:280,rating:4.4,reviews:210,ar:"علب تخزين محكمة ١٠ قطع",en:"10-pc airtight containers"}
+];
+const MEDALLIONS=[
+  {id:"m49",type:"text",ar:{big:"أقل من",num:49,cap:"كل الصفقات"},en:{big:"Below",num:49,cap:"Shop all deals"}},
+  {id:"m99",type:"text",ar:{big:"أقل من",num:99,cap:"كل الصفقات"},en:{big:"Below",num:99,cap:"Shop all deals"}},
+  {id:"beauty",type:"icon",icon:"sparkles",num:199,pre:"below",ar:{cap:"الجمال"},en:{cap:"Beauty"}},
+  {id:"pc",type:"icon",icon:"laptop",num:49,pre:"from",ar:{cap:"كمبيوتر وإكسسوارات"},en:{cap:"Computers & accessories"}},
+  {id:"market",type:"icon",icon:"utensils",num:159,pre:"below",ar:{cap:"سوبر ماركت"},en:{cap:"Supermarket"}},
+  {id:"elec",type:"icon",icon:"headphones",num:399,pre:"below",ar:{cap:"إلكترونيات"},en:{cap:"Electronics"}},
+  {id:"kitchen",type:"icon",icon:"coffee",num:249,pre:"below",ar:{cap:"المطبخ"},en:{cap:"Kitchen"}},
+  {id:"toys",type:"icon",icon:"gamepad-2",num:299,pre:"below",ar:{cap:"ألعاب"},en:{cap:"Toys & gaming"}}
+];
+
+/* --------------------------------- Helpers --------------------------------- */
+const detectLocale=()=>{try{return (navigator.language||"ar").toLowerCase().startsWith("en")?"en":"ar";}catch{return "ar";}};
+const prefersDark=()=>{try{return matchMedia("(prefers-color-scheme: dark)").matches;}catch{return false;}};
+const prefersReduced=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches;}catch{return false;}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const fmts={};
+function buildFmt(locale){
+  if(fmts[locale])return fmts[locale];
+  const tag=locale==="ar"?"ar-EG":"en-EG";
+  const cur=new Intl.NumberFormat(tag,{style:"currency",currency:"EGP",maximumFractionDigits:0});
+  const int=new Intl.NumberFormat(tag);
+  const two=new Intl.NumberFormat(tag,{minimumIntegerDigits:2});
+  fmts[locale]={cur:v=>cur.format(v),int:v=>int.format(v),two:v=>two.format(v)};
+  return fmts[locale];
+}
+
+const ic=(name,size,sw,style="",cls="")=>`<i data-lucide="${name}" width="${size}" height="${size}"${sw?` stroke-width="${sw}"`:""}${style?` style="${style}"`:""}${cls?` class="${cls}"`:""}></i>`;
+
+/* ---------------------------------- State ---------------------------------- */
+const S={locale:detectLocale(),theme:prefersDark()?"dark":"light",drawer:false,cart:0,loaded:false,hero:0,heroPaused:false,drawerPanel:null,drawerShowAll:false,acctOpen:false,search:"",searchOpen:false,searchActive:-1};
+let heroTimer=null,countdownTimer=null,toastTimer=null;
+
+/* ------------------------------ Small builders ----------------------------- */
+function starsHTML(rating,reviews,fmt){
+  let s="";for(let i=1;i<=5;i++)s+=ic("star",13,1.5,`color:var(--star);fill:${i<=Math.round(rating)?"var(--star)":"transparent"}`);
+  return `<div class="flex items-center gap-1"><span class="flex items-center gap-1">${s}</span><span class="text-xs" style="color:var(--link)">${fmt.int(reviews)}</span></div>`;
+}
+function starSeal(inner,size=140){
+  return `<div class="relative grid place-items-center shrink-0" style="width:${size}px;height:${size}px">
+    <div class="absolute rounded-full" style="inset:6%;background:radial-gradient(circle at 35% 30%,#FFD79A,var(--gold) 55%,var(--gold-2));box-shadow:var(--seal)"></div>
+    <div class="relative text-center px-4" style="color:var(--gold-ink)">${inner}</div></div>`;
+}
+function starSealMini(){
+  return `<span class="relative grid place-items-center w-7 h-7" aria-hidden="true">
+    <span class="absolute rounded-md" style="inset:2px;background:linear-gradient(140deg,var(--gold),var(--gold-2))"></span>
+    <span class="absolute rounded-md" style="inset:2px;background:linear-gradient(140deg,var(--gold),var(--gold-2));transform:rotate(45deg)"></span>
+    ${ic("gem",13,null,"color:var(--gold-ink)","relative")}</span>`;
+}
+function tile(icon,label,hue){
+  return `<div class="min-w-0"><div class="rounded-lg grid place-items-center aspect-square" style="background:${hue||"var(--tile)"}">
+    ${ic(icon,40,1.4,`color:${hue?"#FDF6E7":"var(--lapis-2)"}`)}</div>
+    <p class="mt-1.5 text-xs font-medium truncate" style="color:var(--muted)">${esc(label)}</p></div>`;
+}
+function skeletonCard(){
+  return `<div class="w-52 shrink-0 rounded-xl p-3 animate-pulse" style="background:var(--surface)">
+    <div class="rounded-lg aspect-square" style="background:var(--tile)"></div>
+    <div class="h-3 rounded mt-3 w-4/5" style="background:var(--tile)"></div>
+    <div class="h-3 rounded mt-2 w-2/5" style="background:var(--tile)"></div>
+    <div class="h-5 rounded mt-3 w-3/5" style="background:var(--tile)"></div></div>`;
+}
+function productCard(p,t,fmt,deal){
+  const L=S.locale;
+  return `<article class="w-52 shrink-0 snap-start rounded-xl p-3 flex flex-col group" style="background:var(--surface);box-shadow:var(--shadow)">
+    <div class="relative rounded-lg aspect-square grid place-items-center overflow-hidden" style="background:${p.hue}">
+      ${ic(p.icon,64,1.1,"color:rgba(253,246,231,.92)","transition-transform duration-300 group-hover:scale-110")}
+      <button aria-label="${esc(t.wish)}" class="focusable absolute top-2 grid place-items-center w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity" style="background:var(--surface);color:var(--pom);inset-inline-end:8px">${ic("heart",16)}</button>
+    </div>
+    <h3 class="clamp2 text-sm font-semibold mt-2 leading-snug" style="color:var(--ink)">${esc(p[L])}</h3>
+    ${starsHTML(p.rating,p.reviews,fmt)}
+    ${deal?`<div class="flex items-center gap-2 mt-1.5">
+      <span class="text-[11px] font-extrabold text-white rounded px-1.5 py-0.5" style="background:var(--pom)">${fmt.int(p.off)}٪ ${esc(t.off)}</span>
+      <span class="text-[11px] font-bold" style="color:var(--pom)">${esc(t.limited)}</span></div>`:""}
+    <div class="flex items-baseline gap-2 mt-1.5">
+      <span class="text-lg font-black" style="color:var(--ink)">${fmt.cur(p.price)}</span>
+      ${p.old?`<s class="text-xs" style="color:var(--muted)">${fmt.cur(p.old)}</s>`:""}</div>
+    <button data-add="${p.id}" class="focusable mt-2.5 rounded-full py-1.5 text-sm font-bold flex items-center justify-center gap-1.5" style="background:var(--gold);color:var(--gold-ink)">${ic("plus",15)} ${esc(t.addToCart)}</button>
+  </article>`;
+}
+function shoveler(id,children,prevL,nextL){
+  return `<div class="relative">
+    <button data-shov="${id}" data-dir="-1" aria-label="${esc(prevL)}" class="focusable absolute top-1/2 -translate-y-1/2 z-10 grid place-items-center w-11 h-16 rounded-lg" style="background:var(--surface);color:var(--ink);box-shadow:var(--shadow);inset-inline-start:8px">${ic("chevron-right",22,null,"","rtl-flip")}</button>
+    <button data-shov="${id}" data-dir="1" aria-label="${esc(nextL)}" class="focusable absolute top-1/2 -translate-y-1/2 z-10 grid place-items-center w-11 h-16 rounded-lg" style="background:var(--surface);color:var(--ink);box-shadow:var(--shadow);inset-inline-end:8px">${ic("chevron-right",22,null,"")}</button>
+    <div id="${id}" class="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory px-1 py-1">${children}</div></div>`;
+}
+function widgetCard(title,footer,children){
+  return `<section class="rounded-xl p-5 flex flex-col min-w-0" style="background:var(--surface);box-shadow:var(--shadow)">
+    <h2 class="text-xl font-extrabold mb-4 leading-snug" style="color:var(--ink)">${esc(title)}</h2>
+    <div class="flex-1 min-w-0">${children}</div>
+    ${footer?`<button class="focusable mt-4 text-sm font-bold self-start hover:underline" style="color:var(--link)">${esc(footer)}</button>`:""}</section>`;
+}
+
+/* --------------------------------- Sections -------------------------------- */
+function headerHTML(t,fmt){
+  const L=S.locale;
+  const matches=searchMatches();
+  const hi="color:var(--nav-ink)",dim="color:rgba(255,255,255,.72)";
+  return `<div style="background:var(--topbar)">
+   <div class="max-w-screen-2xl mx-auto px-3 sm:px-4 py-2 flex items-center flex-wrap gap-x-2 gap-y-2">
+    <a href="#" class="focusable flex items-center gap-1.5 shrink-0 rounded px-1 py-1" onclick="event.preventDefault()">${starSealMini()}<span class="text-2xl font-black tracking-tight" style="${hi}">${esc(t.brand)}</span></a>
+    <button class="focusable hidden lg:flex items-center gap-1 rounded px-2 py-1 text-start hover:outline hover:outline-1" style="outline-color:rgba(255,255,255,.5)">
+      ${ic("map-pin",18,null,"color:var(--gold)")}
+      <span class="leading-tight"><span class="block text-[11px]" style="${dim}">${esc(t.deliverTo)} ${esc(t.city)}</span><span class="block text-xs font-bold" style="${hi}">${esc(t.updateLoc)}</span></span></button>
+
+    <div id="searchBox" class="relative order-last w-full md:order-none md:w-auto md:flex-1 min-w-0">
+      <div class="flex rounded-lg overflow-hidden" style="background:var(--surface)">
+        <span class="hidden sm:flex items-center gap-1 px-3 text-xs font-bold shrink-0" style="background:var(--tile);color:var(--muted);border-inline-end:1px solid var(--line)">${esc(t.searchIn)} ${ic("chevron-down",13)}</span>
+        <input id="searchInput" value="${esc(S.search)}" placeholder="${esc(t.searchPh)}" role="combobox" aria-expanded="${S.searchOpen&&matches.length>0}" aria-autocomplete="list" class="flex-1 min-w-0 px-3 py-2 text-sm outline-none bg-transparent" style="color:var(--ink)">
+        <button id="searchGo" aria-label="${esc(t.searchBtn)}" class="focusable grid place-items-center px-4 shrink-0" style="background:var(--gold);color:var(--gold-ink)">${ic("search",19,2.4)}</button>
+      </div>
+      ${S.searchOpen&&matches.length>0?`<ul class="absolute z-30 mt-1 w-full rounded-lg overflow-hidden py-1" style="background:var(--surface);box-shadow:var(--shadow);border:1px solid var(--line)">
+        ${matches.map((m,i)=>`<li><button data-sopt="${esc(m)}" data-i="${i}" class="w-full text-start px-3 py-2 text-sm flex items-center gap-2" style="background:${i===S.searchActive?"var(--tile)":"transparent"};color:var(--ink)">${ic("search",13,null,"color:var(--muted)")} ${esc(m)}</button></li>`).join("")}
+      </ul>`:""}
+    </div>
+
+    <button id="langBtn" class="focusable flex items-center gap-1 rounded px-2 py-1.5 text-sm font-bold hover:opacity-80" style="${hi}" aria-label="${esc(t.langRow)}">🇪🇬 ${L==="ar"?"EN":"عربي"} ${ic("chevron-down",12)}</button>
+    <button id="themeBtn" class="focusable grid place-items-center w-9 h-9 rounded hover:opacity-80" style="${hi}" aria-label="theme">${ic(S.theme==="light"?"moon":"sun",18)}</button>
+
+    <div id="acctBox" class="relative hidden sm:block">
+      <button id="acctBtn" aria-expanded="${S.acctOpen}" class="focusable text-start rounded px-2 py-1 leading-tight hover:opacity-80">
+        <span class="block text-[11px]" style="${dim}">${esc(t.hello)}</span>
+        <span class="flex items-center gap-0.5 text-xs font-bold" style="${hi}">${esc(t.account)} ${ic("chevron-down",12)}</span></button>
+      ${S.acctOpen?`<div class="absolute z-30 mt-1.5 w-60 rounded-xl p-3" style="background:var(--surface);box-shadow:var(--shadow);border:1px solid var(--line);inset-inline-end:0">
+        <button class="focusable w-full rounded-full py-2 text-sm font-extrabold" style="background:var(--gold);color:var(--gold-ink)">${esc(t.signIn)}</button>
+        <p class="text-center text-[11px] mt-1.5" style="color:var(--muted)">${esc(t.newHere)} <span class="font-bold" style="color:var(--link)">${esc(t.createAcc)}</span></p>
+        <hr class="my-2.5" style="border-color:var(--line)">
+        ${[t.yourAccount,t.yourOrders,t.yourWishlist,t.yourPoints].map(l=>`<button class="focusable w-full text-start text-sm py-1.5 px-1 rounded hover:underline" style="color:var(--ink)">${esc(l)}</button>`).join("")}
+      </div>`:""}
+    </div>
+
+    <button class="focusable hidden lg:block text-xs font-bold rounded px-2 py-2 hover:opacity-80" style="${hi}">${ic("package",16,null,"color:var(--gold)","inline -mt-0.5 me-1")}${esc(t.orders)}</button>
+
+    <button class="focusable relative flex items-end gap-1 rounded px-2 py-1 hover:opacity-80" aria-label="${esc(t.cart)}">
+      <span class="relative">${ic("shopping-cart",26,null,hi)}
+        <span id="cartCount" class="absolute -top-2 grid place-items-center min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-black" style="background:var(--gold);color:var(--gold-ink);inset-inline-end:-6px" aria-hidden="true">${fmt.int(S.cart)}</span></span>
+      <span class="hidden md:block text-xs font-bold" style="${hi}">${esc(t.cart)}</span></button>
+   </div>
+  </div>`;
+}
+function navHTML(t){
+  return `<nav style="background:var(--lapis)" aria-label="Primary">
+   <div class="max-w-screen-2xl mx-auto px-3 sm:px-4 flex items-center gap-1">
+    <button id="navMenu" class="focusable flex items-center gap-1.5 px-2 py-2.5 text-sm font-extrabold shrink-0 rounded hover:opacity-90" style="color:var(--nav-ink)">${ic("menu",19)} ${esc(t.all)}</button>
+    <div class="flex items-center gap-0.5 overflow-x-auto no-scrollbar min-w-0">
+      ${t.nav.map(l=>`<button class="focusable whitespace-nowrap px-2.5 py-2.5 text-[13px] font-medium rounded hover:opacity-80" style="color:var(--nav-ink)">${esc(l)}</button>`).join("")}</div>
+    <span class="hidden xl:flex items-center gap-2 ms-auto shrink-0 text-xs font-extrabold px-3 py-2.5" style="color:var(--magenta)"><span class="flex items-center gap-1.5" style="color:var(--magenta)">${ic("sparkles",13)} ${esc(t.promo.split(" | ")[0]||t.promo)}</span><span class="opacity-70" style="color:var(--nav-ink)">| ${esc((t.promo.split(" | ")[1]||""))}</span></span>
+   </div></nav>`;
+}
+function drawerRow(label,icon,chevron,attr=""){
+  return `<button ${attr} class="focusable w-full flex items-center gap-3 px-5 py-3 text-sm text-start" style="color:var(--ink)" onmouseenter="this.style.background='var(--tile)'" onmouseleave="this.style.background='transparent'">
+    ${icon?ic(icon,18,null,"color:var(--teal)"):""}<span class="flex-1 min-w-0 truncate">${esc(label)}</span>${chevron?ic("chevron-right",16,null,"color:var(--muted)","rtl-flip"):""}</button>`;
+}
+function drawerSection(title,rows){
+  return `<div class="py-2" style="border-bottom:1px solid var(--line)"><h3 class="px-5 py-2 text-lg font-extrabold" style="color:var(--ink)">${esc(title)}</h3>${rows}</div>`;
+}
+function drawerHTML(t){
+  const L=S.locale,open=S.drawer;
+  const rtl=document.documentElement.dir==="rtl";
+  const closedShift=rtl?"100%":"-100%";
+  const cat=CATEGORIES.find(c=>c.id===S.drawerPanel);
+  const list=
+    drawerSection(t.trending,drawerRow(t.bestSellers)+drawerRow(t.newArrivals))+
+    drawerSection(t.digital,drawerRow(t.ereaders)+drawerRow(t.giftCards))+
+    drawerSection(t.shopByCat,
+      CATEGORIES.map(c=>drawerRow(c[L],c.icon,true,`data-panel="${c.id}"`)).join("")+
+      (S.drawerShowAll?EXTRA_CATEGORIES.map(c=>drawerRow(c[L],c.icon)).join(""):"")+
+      `<button id="drawerShowAll" class="focusable w-full flex items-center gap-2 px-5 py-3 text-sm font-bold" style="color:var(--link)">${esc(S.drawerShowAll?t.seeLess:t.seeAll)} ${ic("chevron-down",15,null,"","transition-transform "+(S.drawerShowAll?"rotate-180":""))}</button>`)+
+    drawerSection(t.programs,drawerRow(t.plus,"gem")+drawerRow(t.outlet)+drawerRow(t.sellOn)+drawerRow(t.saveSub))+
+    drawerSection(t.helpSettings,
+      drawerRow(t.yourAccount,"user")+
+      drawerRow(`${t.langRow}: ${L==="ar"?"العربية":"English"}`,"globe",false,'data-act="lang"')+
+      drawerRow(S.theme==="light"?"Dark mode":"Light mode",S.theme==="light"?"moon":"sun",false,'data-act="theme"')+
+      drawerRow(t.country,"map-pin")+drawerRow(t.help)+drawerRow(t.signIn));
+  const detail=cat?`<button data-panel="" class="focusable w-full flex items-center gap-2 px-5 py-4 text-sm font-extrabold" style="color:var(--ink);border-bottom:1px solid var(--line)">${ic("chevron-right",17,null,"","rot180 rtl-keep")} ${esc(t.back)}</button>
+    <h3 class="px-5 pt-4 pb-2 text-lg font-extrabold" style="color:var(--ink)">${esc(cat[L])}</h3>${cat.sub[L].map(s=>drawerRow(s)).join("")}`:"";
+  const slideOut=rtl?"18%":"-18%",slideIn=rtl?"-100%":"100%";
+  return `<div class="fixed inset-0 z-40 ${open?"":"pointer-events-none"}">
+    <div id="drawerScrim" class="absolute inset-0 transition-opacity duration-300" style="background:var(--scrim);opacity:${open?1:0}"></div>
+    <div role="dialog" aria-modal="true" class="absolute top-0 h-full w-[86vw] max-w-[400px] flex flex-col transition-transform duration-300 ease-out" style="background:var(--surface);inset-inline-start:0;transform:translateX(${open?"0":closedShift});box-shadow:var(--shadow)">
+      <div class="flex items-center gap-3 px-5 py-4 shrink-0" style="background:var(--lapis);color:var(--nav-ink)">${ic("user",22)}<span class="text-lg font-extrabold flex-1">${esc(t.hello)}</span>
+        <button id="drawerClose" aria-label="${esc(t.close)}" class="focusable grid place-items-center w-9 h-9 rounded-lg hover:opacity-80">${ic("x",20)}</button></div>
+      <div class="relative flex-1 overflow-hidden">
+        <div class="absolute inset-0 overflow-y-auto transition-transform duration-300" style="transform:translateX(${S.drawerPanel?slideOut:"0"})">${list}</div>
+        <div class="absolute inset-0 overflow-y-auto transition-transform duration-300" style="background:var(--surface);transform:translateX(${S.drawerPanel?"0":slideIn})">${detail}</div>
+      </div>
+    </div></div>`;
+}
+function heroHTML(t){
+  const L=S.locale,i=S.hero,n=HERO_SLIDES.length;
+  const slides=HERO_SLIDES.map(s=>{const c=s[L];return `<div dir="${L==="ar"?"rtl":"ltr"}" class="w-full shrink-0 relative flex items-center" style="min-height:360px;background:${s.bg}">
+    ${ic(s.icon,340,0.6,"color:#FDF6E7;inset-inline-end:4%","absolute opacity-15 -bottom-16 pointer-events-none")}
+    <div class="max-w-screen-2xl mx-auto w-full px-6 sm:px-14 pb-24 relative">
+      <h1 class="text-3xl sm:text-5xl font-black leading-tight max-w-xl" style="color:#FDF6E7">${esc(c.t)}</h1>
+      <p class="mt-2 text-base sm:text-xl font-semibold max-w-lg" style="color:rgba(253,246,231,.88)">${esc(c.s)}</p>
+      <button class="focusable mt-5 rounded-full px-6 py-2.5 text-sm font-extrabold" style="background:var(--gold);color:var(--gold-ink)">${esc(c.c)}</button>
+      ${c.fine?`<p class="mt-3 text-[11px]" style="color:rgba(253,246,231,.6)">${esc(c.fine)}</p>`:""}</div></div>`;}).join("");
+  return `<section aria-label="${esc(t.brand)}" id="hero" class="relative overflow-hidden">
+    <div dir="ltr" id="heroTrack" class="flex transition-transform duration-500 ease-out" style="transform:translateX(-${i*100}%)">${slides}</div>
+    <button data-hero="-1" aria-label="${esc(t.heroPrev)}" class="focusable absolute top-0 w-12 grid place-items-center hover:bg-black/10" style="bottom:96px;color:#FDF6E7;inset-inline-start:0">${ic("chevron-right",34,1.5,"","rtl-keep rot180")}</button>
+    <button data-hero="1" aria-label="${esc(t.heroNext)}" class="focusable absolute top-0 w-12 grid place-items-center hover:bg-black/10" style="bottom:96px;color:#FDF6E7;inset-inline-end:0">${ic("chevron-right",34,1.5,"","rtl-keep")}</button>
+    <div class="absolute inset-x-0 flex justify-center gap-2" style="bottom:96px">
+      ${HERO_SLIDES.map((s,k)=>`<button data-dot="${k}" aria-label="${esc(t.heroDot)} ${k+1}" class="focusable h-2.5 rounded-full transition-all" style="background:${k===i?"var(--gold)":"rgba(253,246,231,.45)"};width:${k===i?22:10}px"></button>`).join("")}</div>
+    <div class="absolute bottom-0 inset-x-0 h-24 pointer-events-none" style="background:linear-gradient(to bottom, transparent, var(--bg))"></div>
+  </section>`;
+}
+function priceTile(pre,n,cap,bg,dark){
+  const fmt=buildFmt(S.locale),tc=dark?"#0F1111":"#fff",sc=dark?"rgba(15,17,17,.7)":"rgba(255,255,255,.85)";
+  return `<div class="min-w-0"><div class="rounded grid place-items-center aspect-square text-center p-2" style="background:${bg}">
+    <div><div class="text-[11px] font-extrabold" style="color:${tc}">${esc(pre)}</div><div class="text-2xl font-black tabular-nums" style="color:${tc}">${fmt.int(n)}</div><div class="text-[10px] font-extrabold" style="color:${sc}">EGP</div></div></div>
+    <p class="mt-1.5 text-xs font-medium truncate" style="color:var(--muted)">${esc(cap)}</p></div>`;
+}
+function overlapRow(t){
+  const L=S.locale==="ar";
+  const below=L?"أقل من":"Below",from=L?"من":"From",Y="var(--gold)",O="var(--orange)";
+  return `<div class="max-w-screen-2xl mx-auto px-3 sm:px-4 relative z-10 -mt-20 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    ${widgetCard(L?"قسّطها براحتك":"Buy Now, Pay Later",L?"اعرف خطط التقسيط":"See installment options",
+      `<div class="rounded-lg h-full min-h-[180px] grid place-items-center p-4" style="background:linear-gradient(140deg,var(--lapis-2),var(--lapis))"><div class="text-center">${ic("credit-card",52,1.2,"color:var(--gold)","mx-auto")}<p class="mt-3 text-sm font-extrabold" style="color:#fff">${L?"ادفع على ٤ دفعات بدون فوايد":"Pay in 4, zero interest"}</p></div></div>`)}
+    ${widgetCard(L?"صفقات البيت من ١٠ جنيه":"Home Deals Starting 10 EGP",t.shopNow,
+      `<div class="grid grid-cols-2 gap-3">${priceTile(below,199,L?"أقل من ١٩٩":"Below 199",Y,true)}${priceTile(below,499,L?"أقل من ٤٩٩":"Below 499",Y,true)}${priceTile(from,500,L?"من ٥٠٠":"From 500",Y,true)}${priceTile(from,999,L?"من ٩٩٩":"From 999",Y,true)}</div>`)}
+    ${widgetCard(L?"لأصحاب الميزانية":"For the budget shoppers",L?"شوف كل الوفر":"Shop more bargains",
+      `<div class="grid grid-cols-2 gap-3">${priceTile(below,99,L?"العناية بالبيت":"Home care",O)}${priceTile(below,149,L?"الصحة والجمال":"Health & Beauty",O)}${priceTile(below,199,L?"البيت والمطبخ":"Home & Kitchen",O)}${priceTile(below,200,L?"إكسسوارات إلكترونية":"Electronics accessories",O)}</div>`)}
+    ${widgetCard(L?"ماركات عالمية لحد باب بيتك":"Global brands, delivered to your doorstep",L?"اطلب من بره":"See more",
+      `<div class="rounded-lg h-full min-h-[180px] grid place-items-center p-4 relative overflow-hidden" style="background:linear-gradient(140deg,var(--teal-2),var(--lapis))">${ic("globe",150,0.7,"color:#fff;inset-inline-end:-16px","absolute -bottom-8 opacity-20")}<div class="text-center relative">${ic("plane",52,1.2,"color:var(--gold)","mx-auto")}<p class="mt-3 text-sm font-extrabold" style="color:#fff">${L?"شحن دولي وتخليص جمركي علينا":"International shipping & customs, handled"}</p></div></div>`)}
+  </div>`;
+}
+function trendRow(t){
+  const L=S.locale==="ar";
+  return `<div class="max-w-screen-2xl mx-auto px-3 sm:px-4 mt-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    ${widgetCard(L?"موضة الصغار بأسعار حلوة":"Tiny trendsetters, smart prices",L?"عرض الكل":"See more",
+      `<div class="grid grid-cols-2 gap-3">${tile("shirt",L?"تيشيرتات ولادي":"Boys' Tops")}${tile("shirt",L?"تيشيرتات بناتي":"Girls' Tops")}${tile("shirt",L?"بناطيل ولادي":"Boys' Pants")}${tile("shirt",L?"بناطيل بناتي":"Girls' Pants")}</div>`)}
+    ${widgetCard(L?"اشترِ ٥ ووفّر ٥٪":"Buy 5 get 5% off",L?"عرض الكل":"See more",
+      `<div class="rounded-lg h-full min-h-[180px] grid place-items-center" style="background:var(--tile)">${ic("shopping-basket",56,1.2,"color:var(--lapis-2)")}</div>`)}
+    ${widgetCard(L?"لحد ٤٠٪ خصم":"Up to 40% off",L?"شوف كل الصفقات":"Shop more bargains",
+      `<div class="rounded-lg h-full min-h-[180px] grid place-items-center p-4 relative overflow-hidden" style="background:var(--orange)">${ic("alarm-clock",120,0.8,"color:#fff;inset-inline-end:-10px","absolute -bottom-6 opacity-25")}<div class="relative text-center"><p class="text-2xl font-black leading-tight" style="color:#fff">${L?"صفقات الفرصة الأخيرة":"Last Chance Deals"}</p><p class="text-sm font-extrabold mt-1" style="color:#fff">${L?"لحد ٤٠٪ خصم":"Up to 40% off"}</p></div></div>`)}
+    ${widgetCard(L?"إلكترونيات أقل من ٢٩٩٩ جنيه":"Electronics under EGP 2,999",L?"شوف كل الصفقات":"Shop more bargains",
+      `<div class="grid grid-cols-2 gap-3">${tile("headphones",L?"سماعات":"Headsets")}${tile("watch",L?"ساعات ذكية":"Smartwatches")}${tile("camera",L?"إكسسوارات كاميرا":"Camera Accessories")}${tile("mouse",L?"إكسسوارات كمبيوتر":"PC Accessories")}</div>`)}
+  </div>`;
+}
+function dealBand(t,fmt){
+  const cards=S.loaded?DEAL_PRODUCTS.map(p=>productCard(p,t,fmt,true)).join(""):Array.from({length:6}).map(skeletonCard).join("");
+  return `<section class="my-6" style="background:var(--orange)">
+    <div class="max-w-screen-2xl mx-auto px-3 sm:px-4 py-6">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <h2 class="text-xl sm:text-2xl font-black" style="color:#fff">${esc(t.dealBandTitle)}</h2>
+        <button class="focusable text-sm font-extrabold underline" style="color:#fff">${esc(t.shopNow)}</button>
+        <span class="ms-auto flex items-center gap-1.5 text-sm font-black tabular-nums rounded-full px-3 py-1" style="background:rgba(15,17,17,.85);color:#fff">${esc(t.endsIn)} <span id="countdown"></span></span>
+      </div>
+      <p class="text-sm font-semibold mt-0.5 mb-4" style="color:rgba(255,255,255,.92)">${esc(t.dealBandSub)}</p>
+      ${shoveler("dealShov",cards,t.heroPrev,t.heroNext)}
+    </div></section>`;
+}
+function medallionStrip(t,fmt){
+  const L=S.locale;
+  const items=MEDALLIONS.map(md=>{const c=md[L];const pre=md.pre==="from"?(L==="ar"?"يبدأ من":"From"):(L==="ar"?"أقل من":"Below");
+    const inner=md.type==="text"?`<div class="text-sm font-extrabold">${esc(c.big)}</div><div class="text-4xl font-black leading-none tabular-nums">${fmt.int(md.num)}</div><div class="text-xs font-extrabold mt-0.5">EGP</div>`:`${ic(md.icon,34,1.6,"","mx-auto")}<div class="text-[11px] font-extrabold mt-1">${esc(pre)}</div><div class="text-xl font-black leading-none tabular-nums">${fmt.cur(md.num)}</div>`;
+    return `<div class="snap-start flex flex-col items-center gap-2 shrink-0">${starSeal(inner)}<span class="text-xs font-bold text-center max-w-[9.5rem]" style="color:var(--ink)">${esc(c.cap)}</span></div>`;}).join("");
+  return `<section class="max-w-screen-2xl mx-auto px-3 sm:px-4"><div class="rounded-xl p-5" style="background:var(--surface);box-shadow:var(--shadow)">
+    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-4"><h2 class="text-xl font-extrabold" style="color:var(--ink)">${esc(t.budgetTitle)}</h2><span class="text-sm font-semibold" style="color:var(--teal)">${esc(t.budgetSub)}</span><button class="focusable ms-auto text-sm font-bold hover:underline" style="color:var(--link)">${esc(t.shopNow)}</button></div>
+    <div class="flex gap-5 overflow-x-auto no-scrollbar snap-x px-1 py-2">${items}</div></div></section>`;
+}
+function essentialsRow(t){
+  const L=S.locale==="ar";
+  return `<div class="max-w-screen-2xl mx-auto px-3 sm:px-4 mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    ${widgetCard(L?"تجميع الأثاث علينا":"Furniture assembly, on us",L?"شوف الأثاث المؤهل":"See eligible furniture",`<div class="rounded-lg min-h-[180px] h-full grid place-items-center" style="background:var(--tile)">${ic("wrench",56,1.2,"color:var(--lapis-2)")}</div>`)}
+    ${widgetCard(L?"جهّز جيمك في البيت":"Build your home gym",L?"تسوّق أجهزة الرياضة":"Shop exercise gear",`<div class="rounded-lg min-h-[180px] h-full grid place-items-center" style="background:var(--tile)">${ic("dumbbell",56,1.2,"color:var(--lapis-2)")}</div>`)}
+    ${widgetCard(L?"أساسيات كل يوم":"Everyday essentials",t.shopNow,`<div class="grid grid-cols-2 gap-3">${tile("shirt",L?"بيزيك رجالي":"Men's basics")}${tile("shirt",L?"بيزيك حريمي":"Women's basics")}${tile("package",L?"شرابات":"Socks")}${tile("sparkles",L?"عناية يومية":"Daily care")}</div>`)}
+    ${widgetCard(L?"أساسيات البيت من ١٩ جنيه":"Home essentials from EGP 19",L?"لبيتك ولك":"For you & your home",`<div class="grid grid-cols-2 gap-3">${tile("sparkles",L?"تنظيف":"Cleaning","linear-gradient(140deg,var(--gold),var(--gold-2))")}${tile("lamp",L?"ديكور":"Home décor","linear-gradient(140deg,var(--gold),var(--gold-2))")}${tile("house",L?"مفروشات":"Linens","linear-gradient(140deg,var(--gold-2),var(--teal-2))")}${tile("package",L?"تنظيم":"Organizers","linear-gradient(140deg,var(--gold-2),var(--teal-2))")}</div>`)}
+  </div>`;
+}
+function topPicks(t,fmt){
+  const cards=S.loaded?TOP_PICKS.map(p=>productCard(p,t,fmt,false)).join(""):Array.from({length:6}).map(skeletonCard).join("");
+  return `<section class="max-w-screen-2xl mx-auto px-3 sm:px-4 mt-6"><div class="rounded-xl p-5" style="background:var(--surface);box-shadow:var(--shadow)">
+    <div class="flex items-baseline gap-4 mb-4"><h2 class="text-xl font-extrabold" style="color:var(--ink)">${esc(t.topPicksTitle)}</h2><button class="focusable text-sm font-bold hover:underline" style="color:var(--link)">${esc(t.explore)}</button></div>
+    ${shoveler("picksShov",cards,t.heroPrev,t.heroNext)}</div></section>`;
+}
+function footerHTML(t,fmt){
+  const L=S.locale;
+  return `<footer class="mt-10">
+    <button id="toTop" class="focusable w-full py-3.5 text-sm font-extrabold flex items-center justify-center gap-2" style="background:var(--lapis-2);color:var(--nav-ink)">${ic("arrow-up",16)} ${esc(t.footTop)}</button>
+    <div style="background:var(--lapis);color:var(--nav-ink)">
+      <div class="max-w-screen-2xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+        ${t.footCols.map(col=>`<nav aria-label="${esc(col.h)}"><h3 class="text-sm font-extrabold mb-3">${esc(col.h)}</h3>${col.l.map(li=>`<button class="focusable block text-[13px] opacity-75 hover:opacity-100 hover:underline py-1 text-start">${esc(li)}</button>`).join("")}</nav>`).join("")}
+      </div>
+      <div class="max-w-screen-2xl mx-auto px-4 pb-8 flex flex-wrap items-center justify-center gap-3" style="border-top:1px solid rgba(253,246,231,.12);padding-top:1.5rem">
+        ${starSealMini()}<span class="font-black text-lg">${esc(t.brand)}</span>
+        <button id="footLang" class="focusable flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold" style="border:1px solid rgba(253,246,231,.3)">${ic("globe",13)} ${L==="ar"?"العربية":"English"}</button>
+        <span class="rounded-full px-3 py-1 text-xs font-bold" style="border:1px solid rgba(253,246,231,.3)">EGP — ج.م</span>
+        <span class="rounded-full px-3 py-1 text-xs font-bold" style="border:1px solid rgba(253,246,231,.3)">🇪🇬 ${esc(t.country)}</span>
+      </div>
+      <p class="text-center text-[11px] opacity-60 pb-6 px-4">${esc(t.rights.replace("{y}",fmt.int(new Date().getFullYear())))} · ${esc(t.tagline)}</p>
+    </div></footer>`;
+}
+
+/* --------------------------------- Search ---------------------------------- */
+function searchPool(){
+  const L=S.locale;
+  return [...CATEGORIES,...EXTRA_CATEGORIES].map(c=>c[L]).concat([...DEAL_PRODUCTS,...TOP_PICKS].map(p=>p[L]));
+}
+function searchMatches(){
+  const v=S.search.trim();if(!v)return [];
+  return searchPool().filter(s=>s.includes(v)).slice(0,7);
+}
+
+/* ---------------------------------- Toast ---------------------------------- */
+function showToast(msg){
+  let el=document.getElementById("toast");
+  if(!el){el=document.createElement("div");el.id="toast";el.setAttribute("role","status");el.setAttribute("aria-live","polite");
+    el.className="fixed bottom-5 inset-x-0 mx-auto w-max max-w-[92vw] z-50 rounded-full px-5 py-2.5 text-sm font-extrabold";document.body.appendChild(el);}
+  el.style.cssText+="background:var(--lapis);color:var(--nav-ink);box-shadow:var(--shadow)";
+  el.textContent=msg;el.style.display="";
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",2200);
+}
+
+/* --------------------------------- Countdown ------------------------------- */
+function tickCountdown(){
+  const el=document.getElementById("countdown");if(!el)return;
+  const fmt=buildFmt(S.locale);const end=new Date();end.setHours(23,59,59,999);
+  const s=Math.max(0,Math.floor((end.getTime()-Date.now())/1000));
+  el.textContent=`${fmt.two(Math.floor(s/3600))}:${fmt.two(Math.floor((s%3600)/60))}:${fmt.two(s%60)}`;
+}
+
+/* ----------------------------------- Hero ---------------------------------- */
+function heroGoto(k){const n=HERO_SLIDES.length;S.hero=(k+n)%n;const tr=document.getElementById("heroTrack");if(tr)tr.style.transform=`translateX(-${S.hero*100}%)`;
+  document.querySelectorAll("[data-dot]").forEach((b,i)=>{b.style.background=i===S.hero?"var(--gold)":"rgba(253,246,231,.45)";b.style.width=(i===S.hero?22:10)+"px";});}
+function startHero(){clearInterval(heroTimer);if(prefersReduced())return;heroTimer=setInterval(()=>{if(!S.heroPaused)heroGoto(S.hero+1);},6000);}
+
+/* ---------------------------------- Render --------------------------------- */
+function render(){
+  const t=M[S.locale],fmt=buildFmt(S.locale),dir=S.locale==="ar"?"rtl":"ltr";
+  document.documentElement.dir=dir;document.documentElement.lang=S.locale;
+  const root=document.getElementById("root");
+  const vars=Object.entries(THEMES[S.theme]).map(([k,v])=>`${k}:${v}`).join(";");
+  root.setAttribute("style",`${vars};background:var(--bg);color:var(--ink)`);
+  root.innerHTML=`
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:px-4 focus:py-2 focus:text-sm focus:font-bold" style="background:var(--gold);color:var(--gold-ink)">${S.locale==="ar"?"تخطَّ إلى المحتوى":"Skip to content"}</a>
+    <header class="sticky top-0 z-30">${headerHTML(t,fmt)}${navHTML(t)}</header>
+    ${drawerHTML(t)}
+    <main id="main">${heroHTML(t)}${overlapRow(t)}${trendRow(t)}${dealBand(t,fmt)}${medallionStrip(t,fmt)}${essentialsRow(t)}${topPicks(t,fmt)}</main>
+    ${footerHTML(t,fmt)}`;
+  lucide.createIcons();
+  wire();
+  tickCountdown();
+  startHero();
+  const inp=document.getElementById("searchInput");
+  if(inp&&S.searchOpen){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
+}
+
+function reRenderKeepScroll(){const y=scrollX,x=scrollY;render();scrollTo(y,x);}
+
+/* --------------------------------- Wiring ---------------------------------- */
+function wire(){
+  const t=M[S.locale];
+  const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+  $("#langBtn")?.addEventListener("click",()=>{S.locale=S.locale==="ar"?"en":"ar";render();});
+  $("#footLang")?.addEventListener("click",()=>{S.locale=S.locale==="ar"?"en":"ar";render();});
+  $("#themeBtn")?.addEventListener("click",()=>{S.theme=S.theme==="light"?"dark":"light";render();});
+  $("#navMenu")?.addEventListener("click",()=>{S.drawer=true;S.drawerPanel=null;S.drawerShowAll=false;render();});
+  $("#drawerClose")?.addEventListener("click",()=>{S.drawer=false;render();});
+  $("#drawerScrim")?.addEventListener("click",()=>{S.drawer=false;render();});
+  $("#drawerShowAll")?.addEventListener("click",()=>{S.drawerShowAll=!S.drawerShowAll;render();});
+  $$("[data-panel]").forEach(b=>b.addEventListener("click",()=>{S.drawerPanel=b.getAttribute("data-panel")||null;render();}));
+  $$("[data-act]").forEach(b=>b.addEventListener("click",()=>{const a=b.getAttribute("data-act");if(a==="lang")S.locale=S.locale==="ar"?"en":"ar";else S.theme=S.theme==="light"?"dark":"light";render();}));
+
+  $("#acctBtn")?.addEventListener("click",e=>{e.stopPropagation();S.acctOpen=!S.acctOpen;reRenderKeepScroll();});
+
+  $$("[data-hero]").forEach(b=>b.addEventListener("click",()=>heroGoto(S.hero+ +b.getAttribute("data-hero"))));
+  $$("[data-dot]").forEach(b=>b.addEventListener("click",()=>heroGoto(+b.getAttribute("data-dot"))));
+  const hero=$("#hero");if(hero){["mouseenter","focusin"].forEach(ev=>hero.addEventListener(ev,()=>S.heroPaused=true));["mouseleave","focusout"].forEach(ev=>hero.addEventListener(ev,()=>S.heroPaused=false));}
+
+  $$("[data-shov]").forEach(b=>b.addEventListener("click",()=>{const el=document.getElementById(b.getAttribute("data-shov"));if(!el)return;const rtl=getComputedStyle(el).direction==="rtl";el.scrollBy({left:(+b.getAttribute("data-dir"))*(rtl?-1:1)*el.clientWidth*0.85,behavior:prefersReduced()?"auto":"smooth"});}));
+
+  $$("[data-add]").forEach(b=>b.addEventListener("click",()=>{const id=+b.getAttribute("data-add");const p=[...DEAL_PRODUCTS,...TOP_PICKS].find(x=>x.id===id);S.cart++;const cc=document.getElementById("cartCount");if(cc)cc.textContent=buildFmt(S.locale).int(S.cart);showToast(`${t.added} — ${p[S.locale]}`);}));
+
+  $("#toTop")?.addEventListener("click",()=>scrollTo({top:0,behavior:prefersReduced()?"auto":"smooth"}));
+
+  const inp=$("#searchInput"),go=$("#searchGo");
+  const commit=v=>{S.search=v;S.searchOpen=false;S.searchActive=-1;reRenderKeepScroll();showToast(S.locale==="ar"?`نتايج «${v}» جاية في مرحلة الـ PLP`:`"${v}" results ship in the PLP phase`);};
+  inp?.addEventListener("input",e=>{S.search=e.target.value;S.searchOpen=true;S.searchActive=-1;reRenderKeepScroll();});
+  inp?.addEventListener("focus",()=>{if(S.search){S.searchOpen=true;reRenderKeepScroll();}});
+  inp?.addEventListener("keydown",e=>{const m=searchMatches();
+    if(!S.searchOpen&&(e.key==="ArrowDown"||e.key==="ArrowUp")){S.searchOpen=true;reRenderKeepScroll();return;}
+    if(e.key==="ArrowDown"){e.preventDefault();S.searchActive=Math.min(S.searchActive+1,m.length-1);reRenderKeepScroll();}
+    else if(e.key==="ArrowUp"){e.preventDefault();S.searchActive=Math.max(S.searchActive-1,-1);reRenderKeepScroll();}
+    else if(e.key==="Enter"){commit(S.searchActive>=0&&m[S.searchActive]?m[S.searchActive]:S.search);}
+    else if(e.key==="Escape"){S.searchOpen=false;S.searchActive=-1;reRenderKeepScroll();}});
+  go?.addEventListener("click",()=>S.search&&commit(S.search));
+  $$("[data-sopt]").forEach(b=>b.addEventListener("mousedown",()=>commit(b.getAttribute("data-sopt"))));
+}
+
+/* Global listeners */
+document.addEventListener("mousedown",e=>{
+  const sb=document.getElementById("searchBox"),ab=document.getElementById("acctBox");
+  let changed=false;
+  if(S.searchOpen&&sb&&!sb.contains(e.target)){S.searchOpen=false;changed=true;}
+  if(S.acctOpen&&ab&&!ab.contains(e.target)){S.acctOpen=false;changed=true;}
+  if(changed)reRenderKeepScroll();
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.drawer){S.drawer=false;render();}});
+
+/* Boot */
+render();
+countdownTimer=setInterval(tickCountdown,1000);
+setTimeout(()=>{S.loaded=true;reRenderKeepScroll();},800);
+</script>
+</body>
+</html>
